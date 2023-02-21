@@ -241,8 +241,15 @@
 
       <!-- Modal body -->
       <div class="modal-body">
-       <div id="response"></div>
-       <div id="response2"></div>
+       <div class="d-flex">
+         <p>These cars are related to this brands -  </p><p id="countp"> </p>
+         
+       </div>
+       <p id="myproduct"></p>
+       <div class="d-flex">
+          <p>do you want to deactivate them</p>
+          <button class="deactivecars">Click here</button>
+       </div>
       <?= $this->Form->create() ?>
               <div class="input-group w-75 input-group-outline mb-2 ms-5">
              
@@ -296,14 +303,15 @@ $(document).on("click", ".edit-brand", function(){
                 var countp = 0;
                 $('#id').val(product['id']);
                 $('#status').val(product['status']);
+          
                 $.each(product, function(k, v) {
 
-                    if (k == 'products') {
-                        $.each($(this), function(index, value) {
-                            if (value.status != 1) {
+                  if (k == 'cars') {
+                    $.each($(this), function(index, value) {
+                            if (value.status != 0) {
                                 countp++;
-                                myHtml += "<li><span>" + value.product_title + "</span></li>";
-                                // console.log(value.product_title);
+                          
+                                myHtml += "<li><span>" + value.name + "</span></li>";
                             }
                         });
                     }
@@ -315,6 +323,44 @@ $(document).on("click", ".edit-brand", function(){
   });
 });    
   
+
+$(document).on("click", ".deactivecars", function(){
+
+var csrfToken = $('meta[name="csrfToken"]').attr('content');
+   $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': csrfToken // this is defined in app.php as a js variable
+      }
+    });
+
+var formData = $(this).attr("editbrand-id");
+
+var status = $('#status').val(); 
+var id = $('#id').val();
+
+
+$.ajax({
+          url: "http://localhost:8765/Users/deactivatecar",
+          type: "JSON",
+          method: "POST",
+          data: {
+              'id': id,
+              'status': status,
+          },
+          success: function(response) {
+            var data = JSON.parse(response);
+        if (data['status'] == 0) {
+           alert(data['message']);
+       } else {
+        swal("Cars related to brand deactivate", "success");
+
+                  }
+          $('#change-status').load('/users/table #change-status');
+            $('#myModal').hide();
+            $('.modal-backdrop').remove();
+          }
+      });
+}); 
 
 
 

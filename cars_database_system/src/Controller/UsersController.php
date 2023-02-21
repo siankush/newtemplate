@@ -728,6 +728,38 @@ public function getbrand($id = null)
     exit;
 }
 
+public function deactivatecar(){
+
+
+    $this->request->allowMethod(['post']);
+    $id = $_POST['id'];
+
+    $status = $_POST['status'];
+    $brandstatus = $this->Brands->get($id);
+    
+    //  echo $status;die;
+    if ($status == 1) {
+        // dd($status);
+        $product = $this->Cars->find('all')->where(['brand_id' => $id]);
+        foreach ($product as $product) {
+            $product->status = 0;
+            $this->Cars->save($product);
+        }
+        // $brandstatus->status = 0;
+    }
+    
+    if ($this->Brands->save($brandstatus)) {
+        // if ($this->Products->save($product)) {
+        echo json_encode(array(
+            "status" => $status,
+            "id" => $id,
+        ));
+        exit;
+    }
+    // }
+
+}
+
 public function deletebrand($id = null){
 
     if ($this->request->is('ajax')) {
